@@ -1,25 +1,48 @@
 // js/admin.js
 
-// --- Variabel Global ---
-let posts = JSON.parse(localStorage.getItem("posts")) || [];
+// --- State ---
+let posts = [];
 let editingPostId = null;
+let deleteId = null;
 
-// --- Utility ---
-function savePosts() {
-    localStorage.setItem("posts", JSON.stringify(posts));
-}
+// --- DOM Elements ---
+const postForm = document.getElementById("postForm");
+const cancelBtn = document.getElementById("cancelBtn");
+const postsTableBody = document.querySelector("#postsTable tbody");
+const postsSearch = document.getElementById("postsSearch");
+const categoryFilter = document.getElementById("categoryFilter");
+const totalPostsEl = document.getElementById("totalPosts");
+const totalViewsEl = document.getElementById("totalViews");
+const totalLikesEl = document.getElementById("totalLikes");
+const totalCategoriesEl = document.getElementById("totalCategories");
+const recentPostsList = document.getElementById("recentPostsList");
+const popularPostsList = document.getElementById("popularPostsList");
+const previewModal = document.getElementById("previewModal");
+const previewContent = document.getElementById("previewContent");
+const confirmModal = document.getElementById("confirmModal");
+const confirmDeleteBtn = document.getElementById("confirmDelete");
 
+// --- Utility Functions ---
 function formatDate(date) {
     return new Date(date).toLocaleDateString("id-ID", {
-        day: "2-digit", month: "short", year: "numeric"
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
     });
 }
 
-// --- Navigasi Sidebar ---
+function resetForm() {
+    postForm.reset();
+    editingPostId = null;
+    cancelBtn.style.display = "none";
+    document.getElementById("pageTitle").innerText = "Buat Artikel";
+}
+
+// --- Sidebar Navigation ---
 document.querySelectorAll(".menu-link").forEach(link => {
     link.addEventListener("click", e => {
         e.preventDefault();
-        let section = link.dataset.section;
+        const section = link.dataset.section;
 
         document.querySelectorAll(".menu-link").forEach(l => l.classList.remove("active"));
         link.classList.add("active");
@@ -31,13 +54,37 @@ document.querySelectorAll(".menu-link").forEach(link => {
     });
 });
 
-// --- Render Posts Table ---
-function renderPosts() {
-    const tbody = document.querySelector("#postsTable tbody");
-    tbody.innerHTML = "";
+// --- Load & Render Posts ---
+async function loadPosts() {
+    try {
+        const response = await window.BlogAPI.getAllPosts({ page: 1, limit: 1000 });
+        if (response.success) {
+            posts = response.data.posts;
+            renderPostsTable();
+            renderDashboardStats();
+            renderRecentPopular();
+        } else {
+            alert("Gagal memuat artikel: " + response.message);
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Terjadi kesalahan saat memuat data.");
+    }
+}
 
-    posts.forEach(post => {
-        let tr = document.createElement("tr");
+function renderPostsTable() {
+    postsTableBody.innerHTML = "";
+    const searchTerm = postsSearch.value.toLowerCase();
+    const selectedCategory = categoryFilter.value;
+
+    const filteredPosts = posts.filter(p => {
+        const matchesSearch = p.title.toLowerCase().includes(searchTerm);
+        const matchesCategory = selectedCategory === "all" || p.category === selectedCategory;
+        return matchesSearch && matchesCategory;
+    });
+
+    filteredPosts.forEach(post => {
+        const tr = document.createElement("tr");
         tr.innerHTML = `
             <td>${post.id}</td>
             <td>${post.title}</td>
@@ -51,63 +98,78 @@ function renderPosts() {
                 <button onclick="showDeleteConfirm(${post.id})" class="btn btn-small btn-danger"><i class="fas fa-trash"></i></button>
             </td>
         `;
-        tbody.appendChild(tr);
+        postsTableBody.appendChild(tr);
+    });
+}
+
+// --- Dashboard Stats ---
+function renderDashboardStats() {
+    totalPostsEl.innerText = posts.length;
+    totalViewsEl.innerText = posts.reduce((sum, p) => sum + p.views, 0);
+    totalLikesEl.innerText = posts.reduce((sum, p) => sum + p.likes, 0);
+    totalCategoriesEl.innerText = [...new Set(posts.map(p => p.category))].length;
+}
+
+function renderRecentPopular() {
+    recentPostsList.innerHTML = "";
+    popularPostsList.innerHTML = "";
+
+    const recentPosts = [...posts].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+    const popularPosts = [...posts].sort((a, b) => b.views - a.views).slice(0, 5);
+
+    recentPosts.forEach(p => {
+        const div = document.createElement("div");
+        div.classList.add("post-item");
+        div.innerHTML = `<strong>${p.title}</strong> - ${formatDate(p.date)}`;
+        recentPostsList.appendChild(div);
     });
 
-    document.getElementById("totalPosts").innerText = posts.length;
+    popularPosts.forEach(p => {
+        const div = document.createElement("div");
+        div.classList.add("post-item");
+        div.innerHTML = `<strong>${p.title}</strong> - ${p.views} views`;
+        popularPostsList.appendChild(div);
+    });
 }
-renderPosts();
 
-// --- Tambah/Edit Post ---
-document.getElementById("postForm").addEventListener("submit", function (e) {
+// --- Create/Edit Post ---
+postForm.addEventListener("submit", async e => {
     e.preventDefault();
 
-    const title = document.getElementById("postTitle").value;
+    const title = document.getElementById("postTitle").value.trim();
     const category = document.getElementById("postCategory").value;
-    const author = document.getElementById("postAuthor").value;
-    const tags = document.getElementById("postTags").value.split(",");
-    const content = document.getElementById("postContent").value;
+    const author = document.getElementById("postAuthor").value.trim();
+    const tags = document.getElementById("postTags").value.split(",").map(t => t.trim()).filter(t => t);
+    const content = document.getElementById("postContent").value.trim();
 
     if (!title || !category || !content) {
         alert("Judul, kategori, dan konten wajib diisi!");
         return;
     }
 
-    if (editingPostId) {
-        // update
-        let post = posts.find(p => p.id === editingPostId);
-        post.title = title;
-        post.category = category;
-        post.author = author;
-        post.tags = tags;
-        post.content = content;
-    } else {
-        // create baru
-        let newPost = {
-            id: Date.now(),
-            title,
-            category,
-            author,
-            tags,
-            content,
-            date: new Date(),
-            views: 0,
-            likes: 0
-        };
-        posts.unshift(newPost);
-    }
+    try {
+        let response;
+        if (editingPostId) {
+            response = await window.BlogAPI.updatePost(editingPostId, { title, category, author, tags, content });
+        } else {
+            response = await window.BlogAPI.createPost({ title, category, author, tags, content });
+        }
 
-    savePosts();
-    renderPosts();
-    this.reset();
-    editingPostId = null;
-    document.getElementById("cancelBtn").style.display = "none";
-    alert("Artikel berhasil disimpan!");
+        if (response.success) {
+            alert("Artikel berhasil disimpan!");
+            resetForm();
+            await loadPosts();
+        } else {
+            alert("Gagal menyimpan artikel: " + response.message);
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Terjadi kesalahan saat menyimpan artikel.");
+    }
 });
 
-// --- Edit Post ---
 function editPost(id) {
-    let post = posts.find(p => p.id === id);
+    const post = posts.find(p => p.id === id);
     if (!post) return;
 
     document.getElementById("postTitle").value = post.title;
@@ -117,52 +179,59 @@ function editPost(id) {
     document.getElementById("postContent").value = post.content;
 
     editingPostId = id;
-    document.getElementById("cancelBtn").style.display = "inline-block";
-
-    // pindah ke form create
+    cancelBtn.style.display = "inline-block";
     document.querySelectorAll(".content-section").forEach(sec => sec.classList.remove("active"));
     document.getElementById("create-section").classList.add("active");
     document.getElementById("pageTitle").innerText = "Edit Artikel";
 }
 
 // --- Cancel Edit ---
-document.getElementById("cancelBtn").addEventListener("click", () => {
-    document.getElementById("postForm").reset();
-    editingPostId = null;
-    document.getElementById("cancelBtn").style.display = "none";
-});
+cancelBtn.addEventListener("click", resetForm);
 
 // --- Delete Post ---
-let deleteId = null;
 function showDeleteConfirm(id) {
     deleteId = id;
-    document.getElementById("confirmModal").style.display = "block";
+    confirmModal.style.display = "block";
 }
 
-document.getElementById("confirmDelete").addEventListener("click", () => {
-    posts = posts.filter(p => p.id !== deleteId);
-    savePosts();
-    renderPosts();
-    closeConfirmModal();
+confirmDeleteBtn.addEventListener("click", async () => {
+    try {
+        const response = await window.BlogAPI.deletePost(deleteId);
+        if (response.success) {
+            alert("Artikel berhasil dihapus!");
+            await loadPosts();
+        } else {
+            alert("Gagal menghapus artikel: " + response.message);
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Terjadi kesalahan saat menghapus artikel.");
+    } finally {
+        closeConfirmModal();
+    }
 });
 
 function closeConfirmModal() {
-    document.getElementById("confirmModal").style.display = "none";
+    confirmModal.style.display = "none";
     deleteId = null;
 }
 
-// --- Preview Artikel ---
+// --- Preview Post ---
 document.getElementById("previewBtn").addEventListener("click", () => {
     const title = document.getElementById("postTitle").value;
     const content = document.getElementById("postContent").value;
 
-    document.getElementById("previewContent").innerHTML = `
-        <h2>${title}</h2>
-        <p>${content.replace(/\n/g, "<br>")}</p>
-    `;
-    document.getElementById("previewModal").style.display = "block";
+    previewContent.innerHTML = `<h2>${title}</h2><p>${content.replace(/\n/g, "<br>")}</p>`;
+    previewModal.style.display = "block";
 });
 
 function closePreview() {
-    document.getElementById("previewModal").style.display = "none";
+    previewModal.style.display = "none";
 }
+
+// --- Search & Filter ---
+postsSearch.addEventListener("input", renderPostsTable);
+categoryFilter.addEventListener("change", renderPostsTable);
+
+// --- Initialize ---
+loadPosts();
