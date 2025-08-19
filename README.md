@@ -225,7 +225,7 @@ Bisa digunakan untuk membuat mobile app atau aplikasi lain yang memerlukan konte
 
 ## Demo
 
-https://islamic-blog-nine.vercel.app/
+[islamic-blog](https://islamic-blog-nine.vercel.app/)
 
 ## 🤝 Kontribusi
 
