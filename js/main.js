@@ -18,20 +18,21 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentSearchTerm = '';
     let currentPage = 1;
     let isLoading = false;
+    let totalPages = 1;
 
     // Initialize
     init();
 
     function init() {
         setupEventListeners();
-        loadArticles();
+        loadArticles(true);
         setupInfiniteScroll();
     }
 
     function setupEventListeners() {
-        // Mobile navigation
+        // Mobile navigation toggle
         navToggle.addEventListener('click', toggleMobileNav);
-        
+
         // Navigation category links
         document.querySelectorAll('.nav-link[data-category]').forEach(link => {
             link.addEventListener('click', handleCategoryClick);
@@ -42,21 +43,21 @@ document.addEventListener('DOMContentLoaded', function() {
             link.addEventListener('click', handleCategoryClick);
         });
 
-        // Search functionality
+        // Search input with debounce
         searchInput.addEventListener('input', debounce(handleSearch, 300));
-        
+
         // Modal controls
         closeModal.addEventListener('click', closeArticleModal);
-        articleModal.addEventListener('click', (e) => {
-            if (e.target === articleModal) {
-                closeArticleModal();
-            }
+        articleModal.addEventListener('click', e => {
+            if (e.target === articleModal) closeArticleModal();
         });
 
-        // Keyboard navigation
-        document.addEventListener('keydown', handleKeyboardNavigation);
+        // Keyboard navigation (ESC to close modal)
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeArticleModal();
+        });
 
-        // Smooth scrolling for anchor links
+        // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', handleSmoothScroll);
         });
@@ -65,14 +66,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function toggleMobileNav() {
         navMenu.classList.toggle('active');
         navToggle.classList.toggle('active');
-        
-        // Animate hamburger bars
         const bars = navToggle.querySelectorAll('.bar');
         bars.forEach((bar, index) => {
             if (navToggle.classList.contains('active')) {
-                if (index === 0) bar.style.transform = 'rotate(45deg) translate(5px, 5px)';
+                if (index === 0) bar.style.transform = 'rotate(45deg) translate(5px,5px)';
                 if (index === 1) bar.style.opacity = '0';
-                if (index === 2) bar.style.transform = 'rotate(-45deg) translate(7px, -6px)';
+                if (index === 2) bar.style.transform = 'rotate(-45deg) translate(7px,-6px)';
             } else {
                 bar.style.transform = 'none';
                 bar.style.opacity = '1';
@@ -83,53 +82,43 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleCategoryClick(e) {
         e.preventDefault();
         const category = e.target.getAttribute('data-category');
-        
         if (category === currentCategory) return;
-        
-        // Update active nav link
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('active');
-        });
+
+        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
         e.target.classList.add('active');
-        
-        // Update state and reload articles
+
         currentCategory = category;
         currentPage = 1;
         loadArticles(true);
-        
-        // Close mobile nav
+
         navMenu.classList.remove('active');
         navToggle.classList.remove('active');
-        
-        // Reset hamburger bars
+        toggleMobileNavBarsReset();
+
+        document.querySelector('.main-content').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function toggleMobileNavBarsReset() {
         const bars = navToggle.querySelectorAll('.bar');
         bars.forEach(bar => {
             bar.style.transform = 'none';
             bar.style.opacity = '1';
-        });
-
-        // Smooth scroll to articles
-        document.querySelector('.main-content').scrollIntoView({
-            behavior: 'smooth'
         });
     }
 
     function handleSearch(e) {
         const searchTerm = e.target.value.trim().toLowerCase();
         if (searchTerm === currentSearchTerm) return;
-        
         currentSearchTerm = searchTerm;
         currentPage = 1;
         loadArticles(true);
     }
 
     function loadArticles(reset = false) {
-        if (isLoading) return;
-        
+        if (isLoading || currentPage > totalPages) return;
         isLoading = true;
         showLoading(reset);
 
-        // Simulate API call delay for better UX
         setTimeout(() => {
             const params = {
                 category: currentCategory,
@@ -139,23 +128,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 sortBy: 'date',
                 sortOrder: 'desc'
             };
-
             const response = window.BlogAPI.getAllPosts(params);
-            
+
             if (response.success) {
+                totalPages = response.data.pagination.totalPages;
                 displayArticles(response.data.posts, reset);
                 updateFilterInfo(response.data);
                 hideLoading();
-                
-                if (response.data.posts.length === 0 && currentPage === 1) {
-                    showNoResults();
-                }
+                if (response.data.posts.length === 0 && currentPage === 1) showNoResults();
             } else {
-                console.error('Failed to load articles:', response.message);
+                console.error('Load articles failed:', response.message);
                 showError('Gagal memuat artikel. Silakan coba lagi.');
                 hideLoading();
             }
-            
+
             isLoading = false;
         }, 300);
     }
@@ -166,39 +152,117 @@ document.addEventListener('DOMContentLoaded', function() {
             noResults.style.display = 'none';
         }
 
-        if (articles.length === 0) {
+        if (!articles.length) {
             if (reset) showNoResults();
             return;
         }
 
-        const articlesHTML = articles.map((article, index) => 
-            createArticleCard(article, index)
-        ).join('');
+        const html = articles.map(createArticleCard).join('');
+        if (reset) articlesGrid.innerHTML = html;
+        else articlesGrid.insertAdjacentHTML('beforeend', html);
 
-        if (reset) {
-            articlesGrid.innerHTML = articlesHTML;
-        } else {
-            articlesGrid.insertAdjacentHTML('beforeend', articlesHTML);
-        }
-
-        // Add click listeners to new article cards
-        const newCards = articlesGrid.querySelectorAll('.article-card:not([data-listener])');
-        newCards.forEach(card => {
+        // Attach click listeners
+        articlesGrid.querySelectorAll('.article-card:not([data-listener])').forEach(card => {
             card.setAttribute('data-listener', 'true');
             card.addEventListener('click', () => {
-                const articleId = parseInt(card.getAttribute('data-id'));
-                openArticleModal(articleId);
+                openArticleModal(parseInt(card.dataset.id));
             });
         });
 
-        // Animate new cards
+        // Animate cards
         setTimeout(() => {
-            newCards.forEach((card, index) => {
-                card.style.animationDelay = `${index * 0.1}s`;
+            articlesGrid.querySelectorAll('.article-card').forEach((card, i) => {
+                card.style.animationDelay = `${i * 0.1}s`;
                 card.classList.add('fade-in');
             });
         }, 50);
     }
 
-    function createArticleCard(article, index) {
-        const formattedDate = formatDate(article.date);
+    function createArticleCard(article) {
+        const date = formatDate(article.date);
+        return `
+            <div class="article-card" data-id="${article.id}">
+                <h3>${article.title}</h3>
+                <p class="excerpt">${article.excerpt}</p>
+                <div class="meta">
+                    <span>${date}</span> | 
+                    <span>${article.author}</span> |
+                    <span>${article.views} views</span> |
+                    <span class="like-btn" data-id="${article.id}">❤️ ${article.likes}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function openArticleModal(id) {
+        const response = window.BlogAPI.getPostById(id);
+        if (!response.success) return showError(response.message);
+
+        const article = response.data;
+        modalBody.innerHTML = `
+            <h2>${article.title}</h2>
+            <p class="meta">${formatDate(article.date)} | ${article.author} | ${article.views} views | ❤️ ${article.likes}</p>
+            <div class="content">${article.content.replace(/\n/g, '<br>')}</div>
+        `;
+        articleModal.style.display = 'flex';
+    }
+
+    function closeArticleModal() {
+        articleModal.style.display = 'none';
+        modalBody.innerHTML = '';
+    }
+
+    function setupInfiniteScroll() {
+        window.addEventListener('scroll', () => {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 200) {
+                if (!isLoading && currentPage < totalPages) {
+                    currentPage++;
+                    loadArticles();
+                }
+            }
+        });
+    }
+
+    function updateFilterInfo(data) {
+        filterInfo.textContent = `Showing ${data.posts.length} of ${data.pagination.totalPosts} articles`;
+        articleCount.textContent = data.pagination.totalPosts;
+    }
+
+    function showLoading(reset = false) {
+        if (reset) articlesGrid.innerHTML = '';
+        loadingSpinner.style.display = 'block';
+        noResults.style.display = 'none';
+    }
+
+    function hideLoading() {
+        loadingSpinner.style.display = 'none';
+    }
+
+    function showNoResults() {
+        noResults.style.display = 'block';
+    }
+
+    function showError(msg) {
+        alert(msg);
+    }
+
+    function debounce(fn, delay) {
+        let timer;
+        return function(...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => fn.apply(this, args), delay);
+        };
+    }
+
+    function formatDate(iso) {
+        const d = new Date(iso);
+        return `${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}`;
+    }
+
+    function handleSmoothScroll(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+    }
+});
+    

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="id" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Blog Islam</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link rel="stylesheet" href="admin-styles.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-mosque"></i> Admin Panel</h2>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="#" class="menu-link active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="menu-link" data-section="posts">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Kelola Artikel</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="menu-link" data-section="create">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Buat Artikel</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="menu-link" data-section="api">
+                    <i class="fas fa-code"></i>
+                    <span>API Management</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="menu-link" data-section="stats">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Statistik</span>
+                </a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="index.html" class="back-to-blog">
+                <i class="fas fa-arrow-left"></i>
+                Kembali ke Blog
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <button class="mobile-toggle" id="mobileToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="page-title" id="pageTitle">Dashboard</h1>
+            <div class="topbar-actions">
+                <button class="btn btn-primary" onclick="refreshData()">
+                    <i class="fas fa-sync"></i>
+                    Refresh
+                </button>
+                <div class="user-menu">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Admin</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Sections -->
+        <div class="content-wrapper">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="content-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalPosts">0</h3>
+                            <p>Total Artikel</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalViews">0</h3>
+                            <p>Total Views</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalLikes">0</h3>
+                            <p>Total Likes</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalCategories">0</h3>
+                            <p>Kategori</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-content">
+                    <div class="recent-posts">
+                        <h3>Artikel Terbaru</h3>
+                        <div id="recentPostsList" class="posts-list">
+                            <!-- Recent posts will be loaded here -->
+                        </div>
+                    </div>
+                    <div class="popular-posts">
+                        <h3>Artikel Populer</h3>
+                        <div id="popularPostsList" class="posts-list">
+                            <!-- Popular posts will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Posts Management Section -->
+            <section id="posts-section" class="content-section">
+                <div class="section-header">
+                    <div class="search-filter">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="postsSearch" placeholder="Cari artikel...">
+                        </div>
+                        <select id="categoryFilter" class="filter-select">
+                            <option value="all">Semua Kategori</option>
+                            <option value="Akidah">Akidah</option>
+                            <option value="Ibadah">Ibadah</option>
+                            <option value="Akhlak">Akhlak</option>
+                            <option value="Sejarah">Sejarah</option>
+                            <option value="Tafsir">Tafsir</option>
+                            <option value="Hadits">Hadits</option>
+                            <option value="Fiqh">Fiqh</option>
+                            <option value="Inspirasi">Inspirasi</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="posts-table-container">
+                    <table class="posts-table" id="postsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Judul</th>
+                                <th>Kategori</th>
+                                <th>Penulis</th>
+                                <th>Tanggal</th>
+                                <th>Views</th>
+                                <th>Likes</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Posts data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Create/Edit Post Section -->
+            <section id="create-section" class="content-section">
+                <form id="postForm" class="post-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="postTitle">Judul Artikel *</label>
+                            <input type="text" id="postTitle" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="postCategory">Kategori *</label>
+                            <select id="postCategory" name="category" required>
+                                <option value="">Pilih Kategori</option>
+                                <option value="Akidah">Akidah</option>
+                                <option value="Ibadah">Ibadah</option>
+                                <option value="Akhlak">Akhlak</option>
+                                <option value="Sejarah">Sejarah Islam</option>
+                                <option value="Tafsir">Tafsir Al-Quran</option>
+                                <option value="Hadits">Hadits</option>
+                                <option value="Fiqh">Fiqh</option>
+                                <option value="Inspirasi">Inspirasi</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="postAuthor">Penulis</label>
+                            <input type="text" id="postAuthor" name="author" placeholder="Nama penulis...">
+                        </div>
+                        <div class="form-group">
+                            <label for="postTags">Tags (pisahkan dengan koma)</label>
+                            <input type="text" id="postTags" name="tags" placeholder="islam, quran, hadits...">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="postContent">Konten Artikel *</label>
+                        <textarea id="postContent" name="content" rows="15" required placeholder="Tulis konten artikel di sini..."></textarea>
+                        <small class="form-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Gunakan paragraf terpisah untuk pemisahan yang jelas. Konten akan diformat otomatis.
+                        </small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="previewBtn" class="btn btn-secondary">
+                            <i class="fas fa-eye"></i>
+                            Preview
+                        </button>
+                        <button type="submit" id="submitBtn" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Simpan Artikel
+                        </button>
+                        <button type="button" id="cancelBtn" class="btn btn-danger" style="display: none;">
+                            <i class="fas fa-times"></i>
+                            Batal
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- API Management Section -->
+            <section id="api-section" class="content-section">
+                <div class="api-info">
+                    <h3>API Information</h3>
+                    <div class="api-details">
+                        <div class="api-item">
+                            <label>Base URL:</label>
+                            <code id="apiBaseUrl">Loading...</code>
+                            <button class="copy-btn" onclick="copyToClipboard('apiBaseUrl')">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <div class="api-item">
+                            <label>API Key:</label>
+                            <code id="apiKey">Loading...</code>
+                            <button class="copy-btn" onclick="copyToClipboard('apiKey')">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <div class="api-item">
+                            <label>Version:</label>
+                            <code>v1.0.0</code>
+                        </div>
+                        <div class="api-item">
+                            <label>Rate Limit:</label>
+                            <code>100 requests/hour</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="api-endpoints">
+                    <h3>Available Endpoints</h3>
+                    <div class="endpoints-list">
+                        <div class="endpoint-item">
+                            <div class="endpoint-method get">GET</div>
+                            <div class="endpoint-path">/api/posts</div>
+                            <div class="endpoint-desc">Get all posts with filtering</div>
+                        </div>
+                        <div class="endpoint-item">
+                            <div class="endpoint-method get">GET</div>
+                            <div class="endpoint-path">/api/posts/{id}</div>
+                            <div class="endpoint-desc">Get single post by ID</div>
+                        </div>
+                        <div class="endpoint-item">
+                            <div class="endpoint-method post">POST</div>
+                            <div class="endpoint-path">/api/posts</div>
+                            <div class="endpoint-desc">Create new post</div>
+                        </div>
+                        <div class="endpoint-item">
+                            <div class="endpoint-method put">PUT</div>
+                            <div class="endpoint-path">/api/posts/{id}</div>
+                            <div class="endpoint-desc">Update existing post</div>
+                        </div>
+                        <div class="endpoint-item">
+                            <div class="endpoint-method delete">DELETE</div>
+                            <div class="endpoint-path">/api/posts/{id}</div>
+                            <div class="endpoint-desc">Delete post</div>
+                        </div>
+                        <div class="endpoint-item">
+                            <div class="endpoint-method get">GET</div>
+                            <div class="endpoint-path">/api/categories</div>
+                            <div class="endpoint-desc">Get all categories</div>
+                        </div>
+                        <div class="endpoint-item">
+                            <div class="endpoint-method get">GET</div>
+                            <div class="endpoint-path">/api/stats</div>
+                            <div class="endpoint-desc">Get blog statistics</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="api-test">
+                    <h3>Test API</h3>
+                    <div class="test-controls">
+                        <select id="testMethod" class="test-select">
+                            <option value="GET">GET</option>
+                            <option value="POST">POST</option>
+                            <option value="PUT">PUT</option>
+                            <option value="DELETE">DELETE</option>
+                        </select>
+                        <input type="text" id="testEndpoint" placeholder="/api/posts" class="test-input">
+                        <button onclick="testAPIEndpoint()" class="btn btn-primary">
+                            <i class="fas fa-play"></i>
+                            Test
+                        </button>
+                    </div>
+                    <div class="test-body" style="display: none;">
+                        <label>Request Body (JSON):</label>
+                        <textarea id="testBody" placeholder='{"title": "Test Post", "category": "Akidah", "content": "Test content"}'></textarea>
+                    </div>
+                    <div class="test-response">
+                        <label>Response:</label>
+                        <pre id="testResponse">Click "Test" to see API response</pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Statistics Section -->
+            <section id="stats-section" class="content-section">
+                <div class="stats-charts">
+                    <div class="chart-container">
+                        <h3>Artikel per Kategori</h3>
+                        <canvas id="categoryChart" width="400" height="200"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Views vs Likes</h3>
+                        <canvas id="engagementChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+
+                <div class="detailed-stats">
+                    <h3>Statistik Detail</h3>
+                    <div id="detailedStatsList" class="stats-list">
+                        <!-- Detailed stats will be loaded here -->
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <!-- Preview Modal -->
+    <div id="previewModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Preview Artikel</h3>
+                <button class="modal-close" onclick="closePreview()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="previewContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Konfirmasi Hapus</h3>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus artikel ini? Tindakan ini tidak dapat dibatalkan.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeConfirmModal()">Batal</button>
+                <button class="btn btn-danger" id="confirmDelete">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
