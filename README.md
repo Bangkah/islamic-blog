@@ -216,3 +216,22 @@ Aplikasi ini fully responsive dan mendukung:
 ```
 
 ## 🔄 Integrasi dengan Backend
+
+Sesuaikan api.js atau koneksi dengan backend nyata jika ingin data persisten
+
+Pastikan endpoint API sesuai dokumentasi
+
+Bisa digunakan untuk membuat mobile app atau aplikasi lain yang memerlukan konten Islami
+
+## 🤝 Kontribusi
+
+    Fork repository
+
+    Buat branch fitur (git checkout -b fitur-baru)
+
+    Commit perubahan (git commit -m 'Tambahkan fitur')
+
+    Push ke branch (git push origin fitur-baru)
+
+    Buat Pull Request
+
