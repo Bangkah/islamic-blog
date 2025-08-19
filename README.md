@@ -40,9 +40,8 @@ Blog Islam adalah aplikasi web dinamis yang memungkinkan pengguna untuk membuat,
 1. **Clone atau Download**
    ```bash
    # Jika menggunakan Git
-   git clone [repository-url]
+   git clone https://github.com/Bangkah/islamic-blog.git
    
-   # Atau download file HTML langsung
    ```
 
 2. **Buka File**
@@ -196,7 +195,6 @@ Aplikasi ini fully responsive dan mendukung:
 
 ### Mengubah Warna Tema
 ```css
-/* Di bagian CSS, ubah variabel berikut: */
 :root {
   --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --accent-color: #f39c12;
@@ -206,14 +204,12 @@ Aplikasi ini fully responsive dan mendukung:
 
 ### Menambah Kategori Baru
 ```html
-<!-- Tambahkan option baru di select kategori -->
 <option value="Doa">Doa-Doa</option>
 <option value="Zakat">Zakat</option>
 ```
 
 ### Mengubah Quote Islam
 ```javascript
-// Ganti teks di bagian islamic-quote
 <div class="islamic-quote">
     "Quote Islam baru di sini..." - Sumber
 </div>
