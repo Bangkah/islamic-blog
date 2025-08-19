@@ -5,608 +5,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog Islam - Berbagi Inspirasi dan Pengetahuan</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            margin-bottom: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            color: #2c3e50;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .subtitle {
-            color: #7f8c8d;
-            font-size: 1.2em;
-            margin-bottom: 20px;
-        }
-
-        .islamic-quote {
-            background: linear-gradient(45deg, #f39c12, #e67e22);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px 0;
-            text-align: center;
-            font-style: italic;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .controls {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e1e8ed;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        button {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        button.secondary {
-            background: linear-gradient(45deg, #95a5a6, #7f8c8d);
-        }
-
-        button.danger {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-        }
-
-        .posts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            margin-top: 30px;
-        }
-
-        .post-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .post-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #667eea, #764ba2, #f39c12);
-        }
-
-        .post-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-        }
-
-        .post-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-        }
-
-        .post-category {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 600;
-        }
-
-        .post-date {
-            color: #7f8c8d;
-            font-size: 0.9em;
-        }
-
-        .post-title {
-            color: #2c3e50;
-            font-size: 1.3em;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .post-content {
-            color: #555;
-            line-height: 1.7;
-            margin-bottom: 20px;
-        }
-
-        .post-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .post-actions button {
-            padding: 8px 16px;
-            font-size: 14px;
-        }
-
-        .api-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-top: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .api-endpoint {
-            background: #2c3e50;
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-            font-family: 'Courier New', monospace;
-        }
-
-        .method {
-            background: #27ae60;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-size: 0.8em;
-            margin-right: 10px;
-        }
-
-        .method.post { background: #f39c12; }
-        .method.put { background: #3498db; }
-        .method.delete { background: #e74c3c; }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-content {
-            background: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .close {
-            position: absolute;
-            right: 20px;
-            top: 20px;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #aaa;
-        }
-
-        .close:hover {
-            color: #667eea;
-        }
-
-        @media (max-width: 768px) {
-            .container { padding: 15px; }
-            h1 { font-size: 2em; }
-            .posts-grid { grid-template-columns: 1fr; }
-            .post-actions { flex-direction: column; }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-mosque"></i> Blog Islam</h1>
-            <p class="subtitle">Berbagi Inspirasi, Pengetahuan, dan Hikmah</p>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-mosque"></i>
+                <span>Blog Islam</span>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="#" class="nav-link active" data-category="all">Semua</a>
+                <a href="#" class="nav-link" data-category="Akidah">Akidah</a>
+                <a href="#" class="nav-link" data-category="Ibadah">Ibadah</a>
+                <a href="#" class="nav-link" data-category="Akhlak">Akhlak</a>
+                <a href="#" class="nav-link" data-category="Sejarah">Sejarah</a>
+                <a href="#" class="nav-link" data-category="Tafsir">Tafsir</a>
+                <a href="#" class="nav-link" data-category="Hadits">Hadits</a>
+                <a href="#" class="nav-link" data-category="Fiqh">Fiqh</a>
+                <a href="admin.html" class="nav-link admin-link">
+                    <i class="fas fa-cog"></i> Admin
+                </a>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <i class="fas fa-book-quran"></i>
+                Blog Islam
+            </h1>
+            <p class="hero-subtitle">Berbagi Inspirasi, Pengetahuan, dan Hikmah Islam</p>
             <div class="islamic-quote">
-                "Dan barangsiapa yang menempuh suatu jalan untuk mencari ilmu, maka Allah akan memudahkan baginya jalan menuju surga." - HR. Muslim
+                <i class="fas fa-quote-left"></i>
+                <p>"Dan barangsiapa yang menempuh suatu jalan untuk mencari ilmu, maka Allah akan memudahkan baginya jalan menuju surga."</p>
+                <small>- HR. Muslim</small>
+                <i class="fas fa-quote-right"></i>
             </div>
-        </header>
-
-        <div class="controls">
-            <h2><i class="fas fa-plus-circle"></i> Tambah Konten Baru</h2>
-            <form id="postForm">
-                <div class="form-group">
-                    <label for="title">Judul</label>
-                    <input type="text" id="title" name="title" required>
-                </div>
-                <div class="form-group">
-                    <label for="category">Kategori</label>
-                    <select id="category" name="category" required>
-                        <option value="">Pilih Kategori</option>
-                        <option value="Akidah">Akidah</option>
-                        <option value="Ibadah">Ibadah</option>
-                        <option value="Akhlak">Akhlak</option>
-                        <option value="Sejarah">Sejarah Islam</option>
-                        <option value="Tafsir">Tafsir Al-Quran</option>
-                        <option value="Hadits">Hadits</option>
-                        <option value="Fiqh">Fiqh</option>
-                        <option value="Inspirasi">Inspirasi</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="content">Konten</label>
-                    <textarea id="content" name="content" rows="6" required></textarea>
-                </div>
-                <button type="submit" id="submitBtn">
-                    <i class="fas fa-save"></i> Simpan
-                </button>
-                <button type="button" id="cancelBtn" class="secondary" style="display: none;">
-                    <i class="fas fa-times"></i> Batal
-                </button>
-            </form>
         </div>
+        <div class="hero-wave">
+            <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"></path>
+            </svg>
+        </div>
+    </section>
 
-        <div id="postsContainer" class="posts-grid"></div>
+    <!-- Search and Filter -->
+    <section class="search-section">
+        <div class="container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Cari artikel...">
+            </div>
+            <div class="filter-info">
+                <span id="filterInfo">Menampilkan semua artikel</span>
+                <span id="articleCount" class="count"></span>
+            </div>
+        </div>
+    </section>
 
-        <div class="api-section">
-            <h2><i class="fas fa-code"></i> API Documentation</h2>
-            <p>Gunakan API berikut untuk mengintegrasikan blog dengan aplikasi lain:</p>
+    <!-- Articles Section -->
+    <main class="main-content">
+        <div class="container">
+            <div id="loadingSpinner" class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Memuat artikel...</p>
+            </div>
             
-            <div class="api-endpoint">
-                <span class="method">GET</span> /api/posts - Mengambil semua postingan
+            <div id="articlesGrid" class="articles-grid"></div>
+            
+            <div id="noResults" class="no-results" style="display: none;">
+                <i class="fas fa-search"></i>
+                <h3>Tidak ada artikel ditemukan</h3>
+                <p>Coba gunakan kata kunci yang berbeda atau jelajahi kategori lain.</p>
             </div>
-            <div class="api-endpoint">
-                <span class="method">GET</span> /api/posts/:id - Mengambil postingan berdasarkan ID
-            </div>
-            <div class="api-endpoint">
-                <span class="method post">POST</span> /api/posts - Membuat postingan baru
-            </div>
-            <div class="api-endpoint">
-                <span class="method put">PUT</span> /api/posts/:id - Mengupdate postingan
-            </div>
-            <div class="api-endpoint">
-                <span class="method delete">DELETE</span> /api/posts/:id - Menghapus postingan
-            </div>
-
-            <button onclick="testAPI()" style="margin-top: 20px;">
-                <i class="fas fa-play"></i> Test API
-            </button>
         </div>
-    </div>
+    </main>
 
-    <!-- Modal for viewing full post -->
-    <div id="postModal" class="modal">
+    <!-- Article Modal -->
+    <div id="articleModal" class="modal">
+        <div class="modal-backdrop"></div>
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <div id="modalContent"></div>
+            <button class="modal-close" id="closeModal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div id="modalBody" class="modal-body"></div>
         </div>
     </div>
 
-    <script>
-        // In-memory storage for posts (simulating a database)
-        let posts = [
-            {
-                id: 1,
-                title: "Keutamaan Belajar dalam Islam",
-                category: "Akidah",
-                content: "Islam sangat menekankan pentingnya menuntut ilmu. Rasulullah SAW bersabda: 'Tuntutlah ilmu dari buaian hingga liang lahat'. Ini menunjukkan bahwa belajar adalah kewajiban setiap Muslim, baik laki-laki maupun perempuan, sepanjang hayat. Ilmu yang bermanfaat akan menjadi amal jariyah yang pahalanya terus mengalir meskipun kita telah meninggal dunia.",
-                date: new Date().toISOString(),
-                author: "Admin"
-            },
-            {
-                id: 2,
-                title: "Adab dalam Bermuamalah",
-                category: "Akhlak",
-                content: "Dalam Islam, bermuamalah atau berinteraksi dengan sesama manusia memiliki adab yang harus dijaga. Diantaranya adalah berlaku jujur, menepati janji, tidak merugikan orang lain, dan selalu menjaga amanah. Rasulullah SAW adalah teladan terbaik dalam hal ini, beliau dikenal dengan gelar Al-Amin (yang terpercaya) bahkan sebelum diangkat menjadi Rasul.",
-                date: new Date(Date.now() - 86400000).toISOString(),
-                author: "Admin"
-            }
-        ];
-        
-        let nextId = 3;
-        let editingId = null;
-
-        // DOM Elements
-        const postForm = document.getElementById('postForm');
-        const postsContainer = document.getElementById('postsContainer');
-        const modal = document.getElementById('postModal');
-        const modalContent = document.getElementById('modalContent');
-        const closeModal = document.querySelector('.close');
-        const submitBtn = document.getElementById('submitBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
-
-        // Event Listeners
-        postForm.addEventListener('submit', handleSubmit);
-        closeModal.addEventListener('click', () => modal.style.display = 'none');
-        cancelBtn.addEventListener('click', cancelEdit);
-        window.addEventListener('click', (e) => {
-            if (e.target === modal) modal.style.display = 'none';
-        });
-
-        // Functions
-        function handleSubmit(e) {
-            e.preventDefault();
-            const formData = new FormData(postForm);
-            const post = {
-                title: formData.get('title'),
-                category: formData.get('category'),
-                content: formData.get('content'),
-                date: new Date().toISOString(),
-                author: 'User'
-            };
-
-            if (editingId) {
-                updatePost(editingId, post);
-            } else {
-                createPost(post);
-            }
-        }
-
-        function createPost(post) {
-            post.id = nextId++;
-            posts.unshift(post);
-            postForm.reset();
-            renderPosts();
-            showNotification('Postingan berhasil ditambahkan!', 'success');
-        }
-
-        function updatePost(id, updatedPost) {
-            const index = posts.findIndex(p => p.id === id);
-            if (index !== -1) {
-                posts[index] = { ...posts[index], ...updatedPost };
-                cancelEdit();
-                renderPosts();
-                showNotification('Postingan berhasil diupdate!', 'success');
-            }
-        }
-
-        function deletePost(id) {
-            if (confirm('Yakin ingin menghapus postingan ini?')) {
-                posts = posts.filter(p => p.id !== id);
-                renderPosts();
-                showNotification('Postingan berhasil dihapus!', 'success');
-            }
-        }
-
-        function editPost(id) {
-            const post = posts.find(p => p.id === id);
-            if (post) {
-                document.getElementById('title').value = post.title;
-                document.getElementById('category').value = post.category;
-                document.getElementById('content').value = post.content;
-                
-                editingId = id;
-                submitBtn.innerHTML = '<i class="fas fa-edit"></i> Update';
-                cancelBtn.style.display = 'inline-block';
-                
-                document.querySelector('.controls').scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-
-        function cancelEdit() {
-            editingId = null;
-            postForm.reset();
-            submitBtn.innerHTML = '<i class="fas fa-save"></i> Simpan';
-            cancelBtn.style.display = 'none';
-        }
-
-        function viewPost(id) {
-            const post = posts.find(p => p.id === id);
-            if (post) {
-                modalContent.innerHTML = `
-                    <h2>${post.title}</h2>
-                    <div style="display: flex; justify-content: space-between; margin: 15px 0; color: #7f8c8d;">
-                        <span class="post-category">${post.category}</span>
-                        <span>${formatDate(post.date)}</span>
-                    </div>
-                    <div style="line-height: 1.8; color: #444;">
-                        ${post.content.replace(/\n/g, '<br>')}
-                    </div>
-                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; color: #7f8c8d;">
-                        <small>Oleh: ${post.author}</small>
-                    </div>
-                `;
-                modal.style.display = 'block';
-            }
-        }
-
-        function renderPosts() {
-            if (posts.length === 0) {
-                postsContainer.innerHTML = `
-                    <div style="text-align: center; padding: 50px; color: #7f8c8d; grid-column: 1/-1;">
-                        <i class="fas fa-inbox" style="font-size: 3em; margin-bottom: 20px; opacity: 0.5;"></i>
-                        <h3>Belum ada postingan</h3>
-                        <p>Mulai berbagi inspirasi dan pengetahuan dengan menambahkan postingan pertama Anda!</p>
-                    </div>
-                `;
-                return;
-            }
-
-            postsContainer.innerHTML = posts.map(post => `
-                <div class="post-card">
-                    <div class="post-header">
-                        <span class="post-category">${post.category}</span>
-                        <span class="post-date">${formatDate(post.date)}</span>
-                    </div>
-                    <h3 class="post-title">${post.title}</h3>
-                    <div class="post-content">${truncateText(post.content, 150)}</div>
-                    <div class="post-actions">
-                        <button onclick="viewPost(${post.id})">
-                            <i class="fas fa-eye"></i> Lihat
-                        </button>
-                        <button onclick="editPost(${post.id})" class="secondary">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button onclick="deletePost(${post.id})" class="danger">
-                            <i class="fas fa-trash"></i> Hapus
-                        </button>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3><i class="fas fa-mosque"></i> Blog Islam</h3>
+                    <p>Platform berbagi inspirasi, pengetahuan, dan hikmah Islam untuk umat di seluruh dunia.</p>
+                    <div class="footer-social">
+                        
+                        <a href="https://github.com/Bangkah"><i class="fab fa-github"></i></a>
+                        <a href="https://instagram.com/mdhiyaulatha"><i class="fab fa-instagram"></i></a>
+                        
                     </div>
                 </div>
-            `).join('');
-        }
+                <div class="footer-section">
+                    <h4>Kategori</h4>
+                    <ul>
+                        <li><a href="#" data-category="Akidah">Akidah</a></li>
+                        <li><a href="#" data-category="Ibadah">Ibadah</a></li>
+                        <li><a href="#" data-category="Akhlak">Akhlak</a></li>
+                        <li><a href="#" data-category="Sejarah">Sejarah Islam</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>API</h4>
+                    <ul>
+                        <li><a href="api-docs.html">Dokumentasi API</a></li>
+                        <li><a href="#" onclick="showAPIKey()">API Key</a></li>
+                        <li><a href="#" onclick="testAPI()">Test API</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Kontak</h4>
+                    <p><i class="fas fa-envelope"></i> mdhyaulatha@gmail.com</p>
+                    <p><i class="fas fa-phone"></i> +62 895-0536-6193 </p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Blog Islam. Muhammad Dhiyaul Atha.</p>
+            </div>
+        </div>
+    </footer>
 
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('id-ID', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-
-        function truncateText(text, maxLength) {
-            if (text.length <= maxLength) return text;
-            return text.substr(0, maxLength) + '...';
-        }
-
-        function showNotification(message, type = 'success') {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: ${type === 'success' ? '#27ae60' : '#e74c3c'};
-                color: white;
-                padding: 15px 20px;
-                border-radius: 10px;
-                z-index: 1001;
-                font-weight: 600;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateX(100%)';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-
-        // API Simulation
-        const API = {
-            getAllPosts: () => posts,
-            getPostById: (id) => posts.find(p => p.id === parseInt(id)),
-            createPost: (post) => {
-                post.id = nextId++;
-                post.date = new Date().toISOString();
-                posts.unshift(post);
-                return post;
-            },
-            updatePost: (id, updatedPost) => {
-                const index = posts.findIndex(p => p.id === parseInt(id));
-                if (index !== -1) {
-                    posts[index] = { ...posts[index], ...updatedPost };
-                    return posts[index];
-                }
-                return null;
-            },
-            deletePost: (id) => {
-                const index = posts.findIndex(p => p.id === parseInt(id));
-                if (index !== -1) {
-                    return posts.splice(index, 1)[0];
-                }
-                return null;
-            }
-        };
-
-        function testAPI() {
-            console.log('=== API Test Results ===');
-            console.log('GET /api/posts:', API.getAllPosts());
-            console.log('GET /api/posts/1:', API.getPostById(1));
-            console.log('POST /api/posts:', API.createPost({
-                title: 'Test Post',
-                category: 'Test',
-                content: 'This is a test post',
-                author: 'API Test'
-            }));
-            console.log('Updated posts:', API.getAllPosts());
-            
-            alert('API test completed! Check browser console for results.');
-            renderPosts();
-        }
-
-        // Initialize
-        renderPosts();
-    </script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
